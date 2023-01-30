@@ -1,0 +1,10 @@
+function [TH] = threshold(IMG, level)
+for i=1:size(IMG,1)
+        for j=1:size(IMG,2)
+            if IMG(i,j,cha) < level
+                TH(i,j,cha)= 0;
+            else
+                TH(i,j,cha)= 1;
+            end
+        end
+end

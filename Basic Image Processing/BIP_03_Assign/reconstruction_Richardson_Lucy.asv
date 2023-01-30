@@ -1,0 +1,30 @@
+function [Output_img] = reconstruction_Richardson_Lucy(Original_Img,PSF,iteration)
+
+for x=1:30
+if iteration == 1
+    recon_image_m=Original_Img;
+end
+PSF1= rot90(PSF,2);
+PSF2 = PSF1(end:-1:1,end:-1:1); % flipped PSF rotated
+
+for i = 1:3 %for each dimension
+Img = Original_Img(:,:,i);% degraded_image
+recon_image = recon_image_m(:,:,i);% reconstructed Image
+
+recon_image_d = im2double(recon_image);
+degraded_image_freq = fft2(Img);%--
+degraded_image_double = im2double(Img);
+recon_image_freq = fft2(recon_image);
+
+Output_img(:,:,i) = zeros(size(Img));
+OTF = psf2otf(PSF1,size(Img));
+OTF2 = psf2otf(PSF2,size(Img));
+
+Denominator = ifft2(recon_image_freq.*OTF);
+temp2 = fft2(degraded_image_double./Denominator);
+
+temp4 = ifft2(temp2 .*OTF2);
+Output_img(:,:,i) =recon_image_d .* temp4 ;
+end
+end
+end

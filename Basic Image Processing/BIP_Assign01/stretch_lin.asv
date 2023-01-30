@@ -1,0 +1,16 @@
+function output_img = stretch_lin(input_img)
+input_img=double(input_img);
+output_img = zeros(size(input_img));    % Initializing output image
+intensity_min = min(input_img,[],'all');%double(min(input_img(:)));  % finding minimum intensity value
+intensity_max = max(input_img,[],'all');%double(max(input_img(:)));  % finding maximum intensity value
+
+
+for i = 1:size(input_img, 1)
+    for j = 1:size(input_img, 2)
+        output_img(i,j)=(255*(input_img(i,j)- intensity_min))/(intensity_max - intensity_min);  % streching with dynamic range
+    end
+end
+
+output_img = uint8(output_img);  % converting double to unit8 type
+
+end

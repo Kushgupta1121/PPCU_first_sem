@@ -1,0 +1,91 @@
+clc;
+clear;
+
+current_directory=cd; % storing the current working directory
+image_dir=(fullfile(cd,'input')); % Image Folder where all the images are stored
+cd(image_dir); % going to image folder where images are stored
+
+Image_name='img4.png'; % Choose the image here, you would like to process 
+
+I = imread(Image_name); % reading the image
+
+% If loop to get the corresponding Loc.txt file for the corresponding Image 
+if (Image_name== 'img1.png')
+file= 'loc1.txt';
+elseif (Image_name== 'img2.png')
+file= 'loc2.txt';
+elseif (Image_name== 'img3.png')
+file= 'loc3.txt';
+elseif (Image_name== 'img4.png')
+file= 'loc4.txt';
+elseif (Image_name== 'img5.png')
+file= 'loc5.txt';
+end
+formatSpec = '%f';
+f = fopen(file,'r'); % opeing the file in read mode
+A = fscanf(f,formatSpec);
+B=[transpose(A(1:20,1)); transpose(A(21:40,1))]; %storing the corresponding co-ordinates at different timestamp
+
+fclose('all'); % closing all the opened files
+cd(current_directory); % moving back to the main working directory
+%------
+X=B(1,:); % Selecting the X co-ordinates
+Y=B(2,:); % Selecting the X co-ordinates
+
+k = fspecial('gaussian',9,1); % creating gaussian kernel.
+
+X_max=max(X); % storing max value of X
+Y_max=max(Y); % storing max value of Y
+
+H=zeros(X_max,Y_max);
+%H=zeros(Y_max,X_max);
+
+[k_x_lim,k_y_lim]=size(k);
+
+H=padarray(H,[floor(k_x_lim/2)+1,floor(k_y_lim/2)+1],0,'both'); % padding matrix with 0 on the boundary.
+
+%H=padarray(H,[floor(k_y_lim/2)+1,floor(k_x_lim/2)+1],0,'both'); % padding matrix with 0 on the boundary.
+
+[h_x_lim,h_y_lim]=size(H);
+
+for i=1:size(B,2)
+row1 = X(i)+1+;
+column1 = Y(i)+1;
+row2 = row1 + k_x_lim-1;
+column2 = column1 + k_y_lim-1;
+temp(row1:row2,column1:column2)=H(row1:row2,column1:column2);
+%temp(column1:column2,row1:row2)=H(column1:column2,row1:row2);
+H(row1:row2,column1:column2)= k+temp(row1:row2,column1:column2);
+%H(column1:column2,row1:row2)= k+temp(column1:column2,row1:row2);
+
+end
+
+% normalization of matrix H
+matsum=sum(H,"all");
+
+for i=1:size(H,1)
+    for j=1:size(H,2)
+        H(i,j)= H(i,j)/matsum;
+    end
+end
+
+%[J,P] = deconvblind(I,k);
+%H=padarray(H,[X_max+1,Y_max+1],0,'both'); % padding matrix with 0 on the boundary.
+
+%imshowpair(I,J,'Montage');
+figure(1)
+subplot(121)
+plot(X,Y,'-s');
+title('GPS/IMU Data');
+
+lrh=fliplr(H);
+udh=flipud(H);
+
+subplot(122)
+imagesc(lrh);
+colormap(gray); colorbar;
+axis equal on;
+title('Assumed PSF');
+
+
+

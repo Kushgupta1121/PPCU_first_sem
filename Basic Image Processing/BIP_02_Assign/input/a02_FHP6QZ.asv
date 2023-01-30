@@ -1,0 +1,25 @@
+% Get list of all BMP files in this directory
+% DIR returns as a structure array.  You will need to use () and . to get
+% the file names.
+clc;
+clear all;
+close all;
+imagefiles = dir('*.jpg');
+nfiles = length(imagefiles);    % Number of files found
+count=0;
+%for i=1:nfiles
+i=2  
+currentfilename = imagefiles(i).name;
+currentimage = imread(currentfilename);
+verbose = false ; % default value of verbose is false
+I=processor(currentimage,verbose); %calling the processor function, and passing all the images one by one to the function.
+count=count+1;
+%figure(4);
+%imshow(I); title('Rotated Image');
+
+%subplot(5,3,i);
+%imshow(gray_image);
+%images{ii} = currentimage;
+%end
+X = ['Processed total ',num2str(count),' Images'];
+disp(X);
